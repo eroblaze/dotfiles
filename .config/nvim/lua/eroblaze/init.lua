@@ -1,0 +1,22 @@
+require("eroblaze.set")
+require("eroblaze.keymaps")
+require("eroblaze.lazy_init")
+require("eroblaze.autocmds")
+
+-- BORDER
+local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+  opts = opts or {}
+  opts.border = opts.border or "rounded"
+  -- opts.max_height = opts.max_height or 7
+  return orig_util_open_floating_preview(contents, syntax, opts, ...)
+end
+-- BORDER
+
+-- local orig_util_stylize_markdown = vim.lsp.util.stylize_markdown
+-- function vim.lsp.util.stylize_markdown(bufnr, contents, opts)
+--   print("USING!")
+--   opts = opts or {}
+--   opts.separator = "||"
+--   return orig_util_stylize_markdown(bufnr, contents, opts)
+-- end
