@@ -2,6 +2,11 @@ return {
   {
     "stevearc/conform.nvim",
     dependencies = { "mason.nvim" },
+    opts = {
+      ui = {
+        border = "rounded",
+      },
+    },
     config = function()
       require("conform").setup({
 

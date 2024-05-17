@@ -16,6 +16,10 @@ vim.opt.breakindent = true
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
 
+vim.opt.conceallevel = 2 -- Check ./autocmds.lua to see the fix for json files
+vim.opt.confirm = true
+vim.opt.cursorline = true
+
 vim.opt.mouse = "a"
 vim.opt.undofile = true
 vim.opt.ignorecase = true
@@ -41,3 +45,7 @@ vim.opt.splitkeep = "cursor"
 -- undercurl
 vim.cmd([[let &t_cs = "\e[4:3m"]])
 vim.cmd([[let &t_ce = "\e[4:0m"]])
+
+if vim.fn.has("nvim-0.10") == 1 then
+  vim.opt.smoothscroll = true
+end

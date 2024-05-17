@@ -59,9 +59,9 @@ return {
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
-          { name = "luasnip" }, -- For luasnip users.
-        }, {
+          { name = "luasnip" },
           { name = "buffer" },
+          { name = "path" },
         }),
       })
     end,
@@ -85,7 +85,6 @@ return {
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { "j-hui/fidget.nvim", opts = {} },
     },
-
     config = function()
       local cmp_lsp = require("cmp_nvim_lsp")
       local capabilities =
@@ -109,9 +108,9 @@ return {
               capabilities = capabilities,
               settings = {
                 Lua = {
-                  runtime = { version = "Lua 5.1" },
+                  runtime = { version = "LuaJIT" },
                   diagnostics = {
-                    globals = { "vim", "it", "describe", "before_each", "after_each" },
+                    globals = { "vim" },
                   },
                 },
               },
@@ -119,6 +118,11 @@ return {
           end,
         },
       })
+
+      require("lspconfig.ui.windows").default_options = {
+        border = "rounded",
+        -- border = [["rounded", "FloatBorder"]],
+      }
     end,
   },
 }
