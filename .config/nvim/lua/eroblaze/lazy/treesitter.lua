@@ -42,7 +42,7 @@ return {
     config = function()
       vim.keymap.set("n", "<leader>mc", function()
         require("treesitter-context").go_to_context(vim.v.count1)
-      end, { silent = true, desc = "Jump up to Context" })
+      end, { desc = "Jump up to Context" })
     end,
   },
 }
