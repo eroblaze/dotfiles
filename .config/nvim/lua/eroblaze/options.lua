@@ -5,6 +5,7 @@
 -- vim.opt.clipboard = "unnamedplus" -- Already mapped 'y' to "+y
 vim.opt.number = true
 vim.opt.relativenumber = true
+vim.opt.numberwidth = 1
 
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
