@@ -3,6 +3,7 @@
 -- vim.g.netrw_winsize = 25
 
 -- vim.opt.clipboard = "unnamedplus" -- Already mapped 'y' to "+y
+vim.opt.backupcopy = "yes" -- Helps to overwrite the file when changes are saved
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.numberwidth = 1
