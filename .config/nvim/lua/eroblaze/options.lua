@@ -29,7 +29,7 @@ vim.opt.smartcase = true
 vim.opt.smartindent = true
 vim.opt.signcolumn = "yes"
 
-vim.opt.updatetime = 250
+vim.opt.updatetime = 200
 vim.opt.timeoutlen = 300
 
 vim.opt.completeopt = "menuone,noselect"
@@ -51,3 +51,7 @@ vim.cmd([[let &t_ce = "\e[4:0m"]])
 if vim.fn.has("nvim-0.10") == 1 then
   vim.opt.smoothscroll = true
 end
+
+vim.g.markdown_fenced_languages = {
+  "ts=typescript",
+}

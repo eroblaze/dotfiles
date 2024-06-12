@@ -6,8 +6,14 @@ return {
   config = function()
     -- Keymaps
     local builtin = require("telescope.builtin")
-    vim.keymap.set("n", "<leader>mf", builtin.find_files, {
-      desc = "Lists files in your current working directory, respects .gitignore",
+    vim.keymap.set("n", "<leader>mf", function()
+      builtin.find_files({
+        hidden = true,
+        no_ignore = true,
+        no_ignore_parent = true,
+      })
+    end, {
+      desc = "Lists files in your current working directory",
     })
     vim.keymap.set("n", "<leader>mr", builtin.oldfiles, { desc = "[?] Find recently opened files" })
     vim.keymap.set("n", "<leader>ma", builtin.git_files, {
