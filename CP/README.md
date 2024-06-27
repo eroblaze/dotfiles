@@ -17,7 +17,7 @@
 2. Create a folder where all the problem folders will be stored.
    If it's for CodeForces, it might be `~/programming/CF` then navigate into the folder and carry out the next step.
 
-3. Run `~/programming/download_prob.py`. This will listen for Competitive Companion's response from the browser. Head over to your browser and click the Competitive Companion button to send the data. Note you can specify the number of questions to receive using the `-n` option. You can also rename the qproblem names on the spot using: `~/programming/download_prob.py one two three`
+3. Run `~/programming/download_prob.py`. This will listen for Competitive Companion's response from the browser. Head over to your browser and click the Competitive Companion button to send the data. Note you can specify the number of questions to receive using the `-n` option. You can also rename the problem names on the spot using: `~/programming/download_prob.py one two three`
 
 4. For each problem, a corresponding folder will be created containing a copy of all the files in your `~/programming/.template/` folder and also the input and output files fetched from Competitive Companion.
 

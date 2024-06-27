@@ -5,13 +5,11 @@ using namespace std;
 #define len(x) (int)(x).size()
 #define all(x) x.begin(), x.end()
 
-template <typename A, typename B>
-ostream &operator<<(ostream &os, const pair<A, B> &p) {
+template <typename A, typename B> ostream &operator<<(ostream &os, const pair<A, B> &p) {
   return os << '(' << p.first << ", " << p.second << ')';
 }
-template <typename T_container, typename T = typename enable_if<
-                                    !is_same<T_container, string>::value,
-                                    typename T_container::value_type>::type>
+template <typename T_container,
+          typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type>
 ostream &operator<<(ostream &os, const T_container &v) {
   os << '{';
   string sep;
@@ -26,9 +24,7 @@ template <typename Head, typename... Tail> void dbg_out(Head H, Tail... T) {
   dbg_out(T...);
 }
 #ifdef ERO_DEBUG
-#define dbg(...)                                                               \
-  cerr << '[' << __FILE__ << ':' << __LINE__ << "] (" << #__VA_ARGS__ << "):", \
-      dbg_out(__VA_ARGS__)
+#define dbg(...) cerr << '[' << __FILE__ << ':' << __LINE__ << "] (" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
 #define dbg(...)
 #endif
@@ -47,17 +43,15 @@ using vvc = vector<vc>;
 using vvb = vector<vb>;
 using vpii = vector<pii>;
 using vtiii = vector<tiii>;
-const vpii dirs{{-1, 0}, {1, 0}, {0, 1}, {0, -1}}; // For GRAPHS
-const vpii dirs_ext{{-1, 0}, {1, 0}, {0, 1},  {0, -1},
-                    {-1, 1}, {1, 1}, {1, -1}, {-1, -1}}; // For GRAPHS
+const vpii dirs{{-1, 0}, {1, 0}, {0, 1}, {0, -1}};                                         // For GRAPHS
+const vpii dirs_ext{{-1, 0}, {1, 0}, {0, 1}, {0, -1}, {-1, 1}, {1, 1}, {1, -1}, {-1, -1}}; // For GRAPHS
 const char nl = '\n';
 const int inf = (int)2e8 + 5;
 
 // Reads input into a vector
 template <typename T> void read(T &, int);
 // Prints out the content of a vector
-template <typename T_vector>
-void output_vector(const T_vector &, bool = 0, int = -1, int = -1);
+template <typename T_vector> void output_vector(const T_vector &, bool = 0, int = -1, int = -1);
 
 void solve() {
   int n;
@@ -82,8 +76,7 @@ template <typename T> void read(T &vec, int sz) {
     cin >> vec[i];
 }
 
-template <typename T_vector>
-void output_vector(const T_vector &v, bool add_one, int start, int end) {
+template <typename T_vector> void output_vector(const T_vector &v, bool add_one, int start, int end) {
   if (start < 0)
     start = 0;
   if (end < 0)

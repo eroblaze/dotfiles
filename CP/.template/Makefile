@@ -103,8 +103,8 @@ endif
 
 %.out: % # Cancel the builtin rule
 
-# diff -c --label=$*.res --label=$*.out $*.res $*.out
 __test_%: %.res %.out
+	# diff -c --label=$*.res --label=$*.out $*.res $*.out
 	output $*.res $*.out
 .PHONY: __test_%
 
