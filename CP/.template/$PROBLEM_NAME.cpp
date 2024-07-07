@@ -2,9 +2,6 @@
 #include "bits/stdc++.h"
 using namespace std;
 
-#define len(x) (int)(x).size()
-#define all(x) x.begin(), x.end()
-
 template <typename A, typename B> ostream &operator<<(ostream &os, const pair<A, B> &p) {
   return os << '(' << p.first << ", " << p.second << ')';
 }
@@ -29,6 +26,9 @@ template <typename Head, typename... Tail> void dbg_out(Head H, Tail... T) {
 #define dbg(...)
 #endif
 
+#define len(x) (int)(x).size()
+#define all(x) x.begin(), x.end()
+
 using ll = int64_t;
 using pii = pair<int, int>;
 using tiii = tuple<int, int, int>;
@@ -43,6 +43,7 @@ using vvc = vector<vc>;
 using vvb = vector<vb>;
 using vpii = vector<pii>;
 using vtiii = vector<tiii>;
+
 const vpii dirs{{-1, 0}, {1, 0}, {0, 1}, {0, -1}};                                         // For GRAPHS
 const vpii dirs_ext{{-1, 0}, {1, 0}, {0, 1}, {0, -1}, {-1, 1}, {1, 1}, {1, -1}, {-1, -1}}; // For GRAPHS
 const char nl = '\n';
