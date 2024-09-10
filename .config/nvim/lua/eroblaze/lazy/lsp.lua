@@ -97,7 +97,7 @@ return {
       require("mason-lspconfig").setup({
         ensure_installed = {
           "lua_ls",
-          "tsserver",
+          "ts_ls",
         },
         handlers = {
           function(server_name) -- default handler (optional)
@@ -112,8 +112,8 @@ return {
               -- single_file_support = true, -- make the deno lsp the default lsp for javascript files
             })
           end,
-          ["tsserver"] = function()
-            nvim_lsp.tsserver.setup({
+          ["ts_ls"] = function()
+            nvim_lsp.ts_ls.setup({
               capabilities = capabilities,
               root_dir = nvim_lsp.util.root_pattern("package.json"),
               single_file_support = false,
