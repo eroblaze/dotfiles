@@ -1,5 +1,5 @@
 // @eroblaze
-#include "bits/stdc++.h"
+#include <bits/stdc++.h>
 using namespace std;
 
 #ifdef ERO_LOCAL
@@ -13,4 +13,3 @@ int main() {
 
   return 0;
 }
-
