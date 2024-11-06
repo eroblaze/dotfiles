@@ -26,3 +26,9 @@ vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move Down" })
 vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move Up" })
 vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move Down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move Up" })
+
+-- Tab management
+vim.keymap.set("n", "<leader>t", ":tabnew<CR>", { noremap = true, desc = "Create a new tab" })
+vim.keymap.set("n", "<leader>tn", ":tabnext<CR>", { noremap = true, desc = "Move to the next tab" })
+vim.keymap.set("n", "<leader>tp", ":tabprevious<CR>", { noremap = true, desc = "Move to the previous tab" })
+vim.keymap.set("n", "<leader>td", ":tabclose<CR>", { noremap = true, desc = "Close the current tab" })
