@@ -1,4 +1,4 @@
-function cls --wraps=clear --description 'alias cls=clear'
+function cls --wraps='cd ~/Desktop/PROJECTS/cls' --wraps=clear --description 'alias cls=clear'
   clear $argv
         
 end
