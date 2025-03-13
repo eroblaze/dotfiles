@@ -46,8 +46,7 @@ save_to_clipboard = true
 
 [window]
 dynamic_title = true
-decorations = "None"
-#opacity = 0.92
+dynamic_padding = true
 opacity = 1
 startup_mode = "Maximized"
 title = "eroblaze"
