@@ -3,3 +3,5 @@
 [user]
 	name = Paul Eboselume
 	email = eboselumepaul@gmail.com
+[credential]
+	credentialStore = gpg
