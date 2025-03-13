@@ -23,14 +23,14 @@ return {
           yaml = { "prettierd" },
           markdown = { "prettierd" },
           graphql = { "prettierd" },
-          python = { "isort", "black" },
+          python = { "black" },
           lua = { "stylua" },
           fish = { "fish_indent" },
           sh = { "shfmt" },
         },
         format_on_save = {
-          lsp_fallback = true,
           timeout_ms = 500,
+          lsp_format = "fallback",
         },
       })
     end,

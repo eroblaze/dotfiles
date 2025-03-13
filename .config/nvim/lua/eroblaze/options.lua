@@ -2,7 +2,7 @@ vim.g.netrw_browse_split = 0
 vim.g.netrw_banner = 0
 vim.g.netrw_winsize = 25
 
--- vim.opt.clipboard = "unnamedplus" -- Already mapped 'y' to "+y
+-- vim.opt.clipboard = "unnamedplus" -- (This option will directly link neovim's copy and paste registers to the system's own which is not too good) Already mapped 'y' to "+y
 vim.opt.backupcopy = "yes" -- Helps to overwrite the file when changes are saved
 vim.opt.number = true
 vim.opt.relativenumber = true
