@@ -104,7 +104,6 @@ endif
 %.out: % # Cancel the builtin rule
 
 __test_%: %.res %.out
-	# diff -c --label=$*.res --label=$*.out $*.res $*.out
 	output $*.res $*.out
 .PHONY: __test_%
 

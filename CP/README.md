@@ -12,7 +12,9 @@
 
 # USAGE
 
-1. Firstly, move all the files into a folder e.g `mkdir ~/programming/`.
+- Make sure the `time` command from `gnu` is installed so the formatting of the output will work.
+
+1. Firstly, move all the script files into a folder e.g `mkdir ~/programming/`.
 
 2. Create a folder where all the problem folders will be stored.
    If it's for CodeForces, it might be `~/programming/CF` then navigate into the folder and carry out the next step.
