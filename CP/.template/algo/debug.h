@@ -1,11 +1,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-/*
- #include "bits/stdc++.h"
-  using namespace std;
-*/
-
 template <typename A, typename B> ostream &operator<<(ostream &os, const pair<A, B> &p) {
   return os << '(' << p.first << ", " << p.second << ')';
 }
@@ -15,8 +10,7 @@ template <typename T_container,
 ostream &operator<<(ostream &os, const T_container &v) {
   os << '{';
   string sep;
-  for (const T &x : v)
-    os << sep << x, sep = ", ";
+  for (const T &x : v) os << sep << x, sep = ", ";
   return os << '}';
 }
 
