@@ -86,7 +86,7 @@ return {
       { "j-hui/fidget.nvim", opts = {} },
       -- `neodev` configures Lua LSP for your Neovim CONFIG, RUNTIME and PLUGINS
       -- used for completion, annotations and signatures of Neovim apis
-      { "folke/neodev.nvim", opts = {} },
+      { "folke/lazydev.nvim", opts = {} },
     },
     config = function()
       local nvim_lsp = require("lspconfig")
@@ -108,6 +108,7 @@ return {
           "pylsp",
           "clangd",
           "bashls",
+          "emmet_ls",
         },
         handlers = {
           function(server_name) -- default handler (optional)

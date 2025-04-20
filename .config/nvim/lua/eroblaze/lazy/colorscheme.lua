@@ -41,14 +41,18 @@ return {
   -- },
 
   {
+    "rebelot/kanagawa.nvim",
+    name = "kanagawa",
+    config = function()
+      vim.cmd("colorscheme kanagawa-lotus")
+    end,
+  },
+
+  {
     "craftzdog/solarized-osaka.nvim",
     name = "solarized-osaka",
-    lazy = false,
-    priority = 1000,
+    lazy = true,
     config = function()
-      require("solarized-osaka").setup({
-        transparent = false,
-      })
       vim.cmd("colorscheme solarized-osaka")
     end,
   },

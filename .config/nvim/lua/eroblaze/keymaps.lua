@@ -2,16 +2,14 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.keymap.set("n", "<leader>me", vim.cmd.Ex, { desc = "Open Ex(Explore)" })
 
-vim.keymap.set("n", "TT", ":TransparentToggle<CR>", { noremap = true, desc = "Toggle background" })
-
 -- Scrolling
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
 -- Copying & Pasting
 vim.keymap.set({ "n", "v" }, "y", '"+y', { noremap = true, desc = "Yank into system's clipboard" })
-vim.keymap.set("n", "<leader>p", '"*p', { desc = "Paste from system's clipboard" })
-vim.keymap.set("n", "<leader>P", '"*P', { desc = "Paste from system's clipboard" })
+vim.keymap.set("n", "<leader>p", '"+p', { desc = "Paste from system's clipboard" })
+vim.keymap.set("n", "<leader>P", '"+P', { desc = "Paste from system's clipboard" })
 
 -- Split window
 vim.keymap.set("n", "<leader>mn", ":split<Return>", { noremap = true, desc = "Split window horizontally" })
