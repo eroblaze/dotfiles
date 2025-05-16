@@ -8,34 +8,16 @@ draw_bold_text_with_bright_colors = true
 # normal = {family="SourceCodePro", style="Regular"}
 # bold = {family="Hack Nerd Font", style = "bold"}
 
-[[keyboard.bindings]]
-action = "Paste"
-key = "V"
-mods = "Control|Shift"
-
-[[keyboard.bindings]]
-action = "Copy"
-key = "C"
-mods = "Control|Shift"
-
-[[keyboard.bindings]]
-action = "ResetFontSize"
-key = "Key0"
-mods = "Control"
-
-[[keyboard.bindings]]
-action = "IncreaseFontSize"
-key = "Equals"
-mods = "Control"
-
-[[keyboard.bindings]]
-action = "DecreaseFontSize"
-key = "Minus"
-mods = "Control"
-
-[[keyboard.bindings]]
-action = "ToggleFullScreen"
-key = "F11"
+[keyboard]
+bindings = [
+  { key = "V", mods = "Control|Shift", action = "Paste" },
+  { key = "C", mods = "Control|Shift", action = "Copy" },
+  { key = "Key0", mods = "Control", action = "ResetFontSize" },
+  { key = "Equals", mods = "Control", action = "IncreaseFontSize" },
+  { key = "Minus", mods = "Control", action = "DecreaseFontSize" },
+  { key = "F11", action = "ToggleFullScreen" },
+  { key = "Return", mods = "Shift|Control", action = "SpawnNewInstance" },
+]
 
 [scrolling]
 history = 10000
