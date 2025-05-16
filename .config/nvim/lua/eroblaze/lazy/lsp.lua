@@ -89,12 +89,8 @@ return {
       { "folke/lazydev.nvim", opts = {} },
     },
     config = function()
-      local nvim_lsp = require("lspconfig")
-      local cmp_lsp = require("cmp_nvim_lsp")
-      local capabilities =
-        vim.tbl_deep_extend("force", {}, vim.lsp.protocol.make_client_capabilities(), cmp_lsp.default_capabilities())
-
       require("mason-lspconfig").setup({
+        automatic_enable = true,
         ensure_installed = {
           "html",
           "cssls",
@@ -102,34 +98,13 @@ return {
           "tailwindcss",
           "lua_ls",
           "ts_ls",
-          "denols",
+          -- "denols",
           "jsonls",
           "marksman",
           "pylsp",
           "clangd",
           "bashls",
           "emmet_ls",
-        },
-        handlers = {
-          function(server_name) -- default handler (optional)
-            require("lspconfig")[server_name].setup({
-              capabilities = capabilities,
-            })
-          end,
-          ["denols"] = function()
-            nvim_lsp.denols.setup({
-              capabilities = capabilities,
-              root_dir = nvim_lsp.util.root_pattern("deno.json", "deno.jsonc"),
-              -- single_file_support = true, -- make the deno lsp the default lsp for javascript files
-            })
-          end,
-          ["ts_ls"] = function()
-            nvim_lsp.ts_ls.setup({
-              capabilities = capabilities,
-              root_dir = nvim_lsp.util.root_pattern("package.json"),
-              single_file_support = false,
-            })
-          end,
         },
       })
       require("lspconfig.ui.windows").default_options = {
