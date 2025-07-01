@@ -1,0 +1,10 @@
+* {
+    // background: #1A1B26;
+    background: rgba(26, 27, 38, 0.9); // 10% transparency of the above hex color
+    background-alt:#383a4f; 
+    foreground:     #C0CAF5;
+    selected: #A0D490;
+    active: #A0D490;
+    urgent:         #F7768E;
+}
+

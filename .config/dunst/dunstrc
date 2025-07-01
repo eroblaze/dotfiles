@@ -1,0 +1,69 @@
+[global]
+		width = 300
+    frame_width = 2
+    origin = top-right
+    offset = (10, 10)
+    corner_radius = 8
+
+    font = Adwaita Sans 11
+    notification_limit = 5
+
+    progress_bar = true
+    progress_bar_height = 5
+    progress_bar_corner_radius = 5
+
+    gap_size = 5
+    line_height = 2
+    vertical_alignment = top
+
+    markup = full
+    format = "<span weight='bold' font='11'>%s</span>\n%b"
+
+    show_age_threshold = "10s"
+
+    min_icon_size = 32
+    max_icon_size = 32
+
+    default_icon = $HOME/.config/dunst/icons/new_battery.svg
+    icon_path = $HOME/.local/share/icons/dunst
+    icon_theme = kora, Papirus, Adwaita, hicolor, breeze
+    enable_recursive_icon_lookup = true
+
+    mouse_left_click = do_action, close_current
+    mouse_middle_click = close_current
+    mouse_right_click = close_all
+
+[urgency_low]
+    background = "#1A1B26E6"; # 10% transparency
+    foreground =   "#C0CAF5"
+    highlight = "#586e75"
+    frame_color = "#586e75"
+    timeout = 3
+
+[urgency_normal]
+    background = "#1A1B26E6";
+    foreground =   "#C0CAF5"
+    highlight =    "#A0D490" 
+    frame_color = "#A0D490"
+    timeout = 5
+
+[urgency_critical]
+    background = "#1A1B26E6";
+    foreground =   "#C0CAF5"
+    highlight = "#F7768E"
+    frame_color = "#F7768E"
+    timeout = 0
+
+[battery_rule]
+    appname = "Battery"
+    icon_path = $HOME/.config/dunst/icons/battery.svg
+
+[volume]
+    appname = "Volume"
+    highlight = "#cba6f7"
+
+[backlight]
+    appname = "Backlight"
+    highlight = "#eba0ac"
+
+# vim: ft=cfg
