@@ -40,18 +40,18 @@ return {
   --   end,
   -- },
 
-  {
-    "rebelot/kanagawa.nvim",
-    name = "kanagawa",
-    config = function()
-      vim.cmd("colorscheme kanagawa-wave")
-    end,
-  },
+  -- {
+  --   "rebelot/kanagawa.nvim",
+  --   name = "kanagawa",
+  --   config = function()
+  --     vim.cmd("colorscheme kanagawa-wave")
+  --   end,
+  -- },
 
   {
     "craftzdog/solarized-osaka.nvim",
     name = "solarized-osaka",
-    lazy = true,
+    lazy = false,
     config = function()
       vim.cmd("colorscheme solarized-osaka")
     end,

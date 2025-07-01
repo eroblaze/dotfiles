@@ -10,8 +10,7 @@ using namespace std;
 
 int main() {
   ios_base::sync_with_stdio(false), cin.tie(0);
-  // USACO
-  /*freopen("usaco.in", "r", stdin), freopen("usaco.out", "w", stdout);*/
+  // freopen("usaco.in", "r", stdin), freopen("usaco.out", "w", stdout);
 
   return 0;
 }
