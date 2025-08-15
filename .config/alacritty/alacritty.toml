@@ -39,6 +39,6 @@ instance = "Alacritty"
 live_config_reload = true
 import = ["/home/eroblaze/.config/alacritty/tokyonight_night.toml"]
 
-# [terminal.shell]
+[terminal.shell]
 #args = ["-l", "-c", "tmux attach || tmux"]
-# program = "/usr/bin/fish"
+program = "/usr/bin/fish"
