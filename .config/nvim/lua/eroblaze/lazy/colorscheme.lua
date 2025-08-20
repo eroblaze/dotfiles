@@ -1,59 +1,26 @@
-return {
-  -- {
-  --   "projekt0n/github-nvim-theme",
-  --   priority = 1000,
-  --   config = function()
-  --     require("github-theme").setup({
-  --       options = {
-  --         dim_inactive = true,
-  --         styles = {
-  --           comments = "italic",
-  --           functions = "NONE",
-  --           keywords = "NONE",
-  --           variables = "NONE",
-  --           conditionals = "NONE",
-  --           constants = "NONE",
-  --           numbers = "NONE",
-  --           operators = "NONE",
-  --           strings = "NONE",
-  --           types = "NONE",
-  --         },
-  --       },
-  --     })
-  --
-  --     vim.cmd("colorscheme github_dark_dimmed")
-  --   end,
-  -- },
+local function safe_dofile(path, fallback)
+  local file = io.open(path, "r")
+  if file then
+    file:close()
+    return dofile(path)
+  else
+    return fallback
+  end
+end
 
-  -- {
-  --   "rose-pine/neovim",
-  --   name = "rose-pine",
-  --   config = function()
-  --     require("rose-pine").setup({
-  --       dim_inactive_windows = true,
-  --       styles = {
-  --         -- transparency = true,
-  --       },
-  --     })
-  --
-  --     vim.cmd("colorscheme rose-pine")
-  --   end,
-  -- },
+local home = os.getenv("HOME")
+local theme_path = home .. "/.config/omarchy/current/theme/neovim.lua"
 
-  -- {
-  --   "rebelot/kanagawa.nvim",
-  --   name = "kanagawa",
-  --   config = function()
-  --     vim.cmd("colorscheme kanagawa-wave")
-  --   end,
-  -- },
-
-  {
-    "craftzdog/solarized-osaka.nvim",
-    name = "solarized-osaka",
-    lazy = false,
-    config = function()
-      vim.cmd("colorscheme solarized-osaka")
-    end,
-  },
+local fallback_theme = {
+  "craftzdog/solarized-osaka.nvim",
+  name = "solarized-osaka",
+  lazy = false,
+  config = function()
+    vim.cmd("colorscheme solarized-osaka")
+  end,
 }
+
+-- Load config or fallback to your theme
+local config = safe_dofile(theme_path, fallback_theme)
+
+return config
