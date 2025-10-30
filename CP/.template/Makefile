@@ -38,7 +38,7 @@ endif
 # Compiler and flags
 CXX := g++
 CXXFLAGS := -std=c++23 -O2 -Wall -Wextra -Wshadow -Wconversion -Wfloat-equal
-DEBUG_CXXFLAGS := -DERO_LOCAL -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC
+DEBUG_CXXFLAGS := -DERO_LOCAL -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -fsanitize=address
 
 ifeq ($(DEBUG),true)
 CXXFLAGS += $(DEBUG_CXXFLAGS)
@@ -59,7 +59,7 @@ veryclean: clean
 	-rm -rf $(PCH_DIR) *.res
 .PHONY: veryclean
 
-rebuild: clean all
+rebuild: veryclean all
 .PHONY: rebuild
 
 # +---------------------+
@@ -110,20 +110,47 @@ debug-pch: $(patsubst %,$(PCH_DIR)/%.gch,$(PRECOMPILE_HEADERS))
 # |   RUNNING / TESTING   |
 # +-----------------------+
 
-export TIME=\n  real\t%es\n  mem\t%MKB\n
-
+# 'run' is for quick, interactive execution where timing is not the focus.
 run: $(TARGET)
 	@echo "[RUN] Executing $(TARGET)..."
-	@\time $(EXECUTE)
+	@$(EXECUTE)
+
 ifeq ($(DEBUG),true)
-	@echo "Built with DEBUG flags enabled, code may be slower than normal"
+	@echo "[INFO] Built with DEBUG flags enabled, code may be slower than normal"
 endif
 .PHONY: run
 
-%.res: $(TARGET) %.in
-	\time $(EXECUTE) < $*.in > $*.res
+# ------------------------------------------------------------------------------------
+# -- Performance Metrics for Competitive Programming --
+# KEY METRIC: "Algorithm (User)" + "System (I/O)" must be under the time limit.
+# ------------------------------------------------------------------------------------
+
+# 'bench' is for accurate timing using a dedicated input file (bench.input).
+.PHONY: bench
+bench: $(TARGET)
+	@# Ensure the bench.input file exists before trying to run.
+	@if [ ! -f bench.input ]; then \
+			echo "[ERROR] bench.input not found. Please create it."; \
+			exit 1; \
+		fi
+		@echo "[BENCH] Running $(TARGET) with bench.input..."
+		@/usr/bin/time -f '\n[PERFORMANCE STATS]\n  Algorithm (User):\t%Us\n  System (I/O):\t\t%Ss\n  Wall Clock:\t\t%es\n  Memory:\t\t%M KB\n' \
+			$(EXECUTE) < bench.input 2>&1 | \
+			awk '{if($$1=="Memory:") printf "  Memory:\t\t%.2f MB\n", $$2/1024; else print $$0}'
+
 ifeq ($(DEBUG),true)
-	@echo "Built with DEBUG flags enabled, code may be slower than normal"
+	@echo "[INFO] Built with DEBUG flags enabled, code may be slower than normal"
+endif
+
+# Runs with input, captures output to .res and timing to .time
+%.res: $(TARGET) %.in
+	@(echo "[RUN] Running with $<...") && \
+		( (/usr/bin/time -f '\n[PERFORMANCE STATS]\n  Algorithm (User):\t%Us\n  System (I/O):\t\t%Ss\n  Wall Clock:\t\t%es\n  Memory:\t\t%M KB\n' \
+			$(EXECUTE) < $*.in > $*.res) 2>&1 | \
+			awk '{if($$1=="Memory:") printf "  Memory:\t\t%.2f MB\n", $$2/1024; else print $$0}' > $*.time )
+
+ifeq ($(DEBUG),true)
+	@echo "[INFO] Built with DEBUG flags enabled, code may be slower than normal"
 endif
 .PRECIOUS: %.res
 

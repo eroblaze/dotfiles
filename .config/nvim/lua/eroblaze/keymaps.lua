@@ -12,14 +12,20 @@ vim.keymap.set("n", "<leader>p", '"+p', { desc = "Paste from system's clipboard"
 vim.keymap.set("n", "<leader>P", '"+P', { desc = "Paste from system's clipboard" })
 
 -- Split window
-vim.keymap.set("n", "<leader>mn", ":split<Return>", { noremap = true, desc = "Split window horizontally" })
-vim.keymap.set("n", "<leader>mm", ":vsplit<Return>", { noremap = true, desc = "Split window vertically" })
+vim.keymap.set("n", "<leader>hs", ":split<Return>", { noremap = true, desc = "Split window horizontally" })
+vim.keymap.set("n", "<leader>vs", ":vsplit<Return>", { noremap = true, desc = "Split window vertically" })
 
 -- Resize window using <ctrl> arrow keys
 vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
 vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
-vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
-vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
+vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
+vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
+
+-- Easier window navigation
+vim.keymap.set('n', '<leader>hh', '<C-w>h', { desc = 'Move to left window' })
+vim.keymap.set('n', '<leader>j', '<C-w>j', { desc = 'Move to lower window' })
+vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Move to upper window' })
+vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Move to right window' })
 
 -- Move Lines
 vim.keymap.set("n", "<C-j>", "<cmd>m .+1<cr>==", { desc = "Move Down" })
