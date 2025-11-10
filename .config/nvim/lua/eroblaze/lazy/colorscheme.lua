@@ -12,11 +12,11 @@ local home = os.getenv("HOME")
 local theme_path = home .. "/.config/omarchy/current/theme/neovim.lua"
 
 local fallback_theme = {
-  "craftzdog/solarized-osaka.nvim",
-  name = "solarized-osaka",
+  "Shatur/neovim-ayu",
+  name = "Ayu",
   lazy = false,
   config = function()
-    vim.cmd("colorscheme solarized-osaka")
+    vim.cmd("colorscheme ayu")
   end,
 }
 
