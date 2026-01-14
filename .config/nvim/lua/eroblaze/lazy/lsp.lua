@@ -81,6 +81,7 @@ return {
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
+      "WhoIsSethDaniel/mason-tool-installer.nvim", -- <— Added for non-LSP tools
       "hrsh7th/cmp-nvim-lsp",
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { "j-hui/fidget.nvim", opts = {} },
@@ -89,6 +90,7 @@ return {
       { "folke/lazydev.nvim", opts = {} },
     },
     config = function()
+      -- Step 1: Mason-LSPConfig setup
       require("mason-lspconfig").setup({
         automatic_enable = true,
         ensure_installed = {
@@ -98,15 +100,28 @@ return {
           "tailwindcss",
           "lua_ls",
           "ts_ls",
-          -- "denols",
+          "denols",
           "jsonls",
           "marksman",
           "pylsp",
           "clangd",
           "bashls",
           "emmet_ls",
+          "emmet_language_server",
+          "stylua",
         },
       })
+
+      -- Step 2: Mason Tool Installer for formatters & utilities
+      require("mason-tool-installer").setup({
+        ensure_installed = {
+          "black", -- Python formatter
+          "prettierd", -- JS/HTML formatter
+          "shfmt", -- Shell formatter
+          "fish-lsp", -- Fish LSP (not covered by mason-lspconfig)
+        },
+      })
+
       require("lspconfig.ui.windows").default_options = {
         border = "rounded",
         -- border = [["rounded", "FloatBorder"]],

@@ -1,8 +1,8 @@
 for ((i = 1; i <= 100; ++i)); do
   echo $i
   ./gen >int
-  ./usaco2 <int >out1
-  ./correct <int >out2
-  diff -w out1 out2 || break
+  ./us <int >us_out
+  ./brute <int >brute_out
+  diff -w us_out brute_out || break
   # diff -w <(./a <int) <(./brute <int) || break
 done
