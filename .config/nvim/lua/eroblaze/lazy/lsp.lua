@@ -106,7 +106,6 @@ return {
           "pylsp",
           "clangd",
           "bashls",
-          "emmet_ls",
           "emmet_language_server",
           "stylua",
         },
@@ -116,7 +115,6 @@ return {
       require("mason-tool-installer").setup({
         ensure_installed = {
           "black", -- Python formatter
-          "prettierd", -- JS/HTML formatter
           "shfmt", -- Shell formatter
           "fish-lsp", -- Fish LSP (not covered by mason-lspconfig)
         },
