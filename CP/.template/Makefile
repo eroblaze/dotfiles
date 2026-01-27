@@ -52,8 +52,9 @@ CLEAN_TARGETS := $(TARGET)
 PLATFORM := auto
 
 ifeq ($(PLATFORM),auto)
-    # Check for Android (Termux) or the TERMUX_VERSION variable
-    IS_PHONE := $(shell uname -o | grep -q Android && echo true || [ -n "$$TERMUX_VERSION" ] && echo true || echo false)
+		# Use the Make built-in 'findstring' to search for "Android" in the kernel info.
+		# This is more robust than shell piping inside a Makefile.
+		IS_PHONE := $(if $(findstring Android,$(shell uname -a)),true,false)
 else ifeq ($(PLATFORM),phone)
     IS_PHONE := true
 else
