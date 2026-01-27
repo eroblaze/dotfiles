@@ -1,5 +1,5 @@
 // @eroblaze
-#include "algo/debug.h"
+#include "../algo/debug.h"
 #include <bits/stdc++.h>
 using namespace std;
 

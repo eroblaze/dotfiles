@@ -1,0 +1,42 @@
+# +-----------------------------------------------------------------------+
+# |                       CLANG-FORMAT CONFIGURATION                      |
+# +-----------------------------------------------------------------------+
+# | This file controls the automatic styling of C++ code.                 |
+# | Usage: clang-format -i sol.cpp                                        |
+# +-----------------------------------------------------------------------+
+
+BasedOnStyle: LLVM
+
+# --- Indentation ---
+ColumnLimit: 120
+AccessModifierOffset: -4
+IndentCaseLabels: true
+
+# --- Braces & Blocks ---
+BreakBeforeBraces: Attach
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+
+# --- Spaces ---
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+SpaceInEmptyParentheses: false
+
+# --- Alignment ---
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+
+# --- Cleanup ---
+SortIncludes: true
+MaxEmptyLinesToKeep: 1
+
+# --- Pointer/Reference Alignment ---
+# Options: Left, Right, Middle (e.g., int* x vs int *x)
+PointerAlignment: Left
+
+# +-----------------------------------------------------------------------+
+# | Note: Some options vary between Clang versions (Termux vs Desktop).   |
+# | If an option causes an error on your phone, comment it out.           |
+# +-----------------------------------------------------------------------+

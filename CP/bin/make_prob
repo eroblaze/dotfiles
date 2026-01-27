@@ -41,14 +41,6 @@ fi
 TEMPLATE_DIRS=("${TEMPLATE_DIRS[@]/%//${TEMPLATE_DIR}}")
 
 # ─────────────────────────────────────────────────────────────
-# Determine rename command
-if hash rename.ul 2>/dev/null; then
-  RENAME="rename.ul"
-else
-  RENAME="rename"
-fi
-
-# ─────────────────────────────────────────────────────────────
 # Process all given folder names
 for filepath in "$@"; do
   if [[ -z "$filepath" ]]; then
@@ -68,42 +60,20 @@ for filepath in "$@"; do
   mkdir -p "$filepath"
 
   # Copy template contents
+  mkdir -p "$filepath"
   for CURRENT_TEMPLATE_DIR in "${TEMPLATE_DIRS[@]}"; do
     if [[ -d "$CURRENT_TEMPLATE_DIR" ]]; then
+      # -r -> To recursively copy a directory
+      # -T -> To directly copy the contents of $CURRENT_TEMPLATE_DIR into $filepath instead of adding the top level directory
+      # -L -> To follow $CURRENT_TEMPLATE_DIR if it's a symbolic link
       cp -rTL "$CURRENT_TEMPLATE_DIR" "$filepath/"
     else
       echo "⚠️ Skipping non-directory: $CURRENT_TEMPLATE_DIR"
     fi
   done
 
-  # Copy files in
-  mkdir -p "$filepath"
-  for CURRENT_TEMPLATE_DIR in "${TEMPLATE_DIRS[@]}"; do
-    # -r -> To recursively copy a directory
-    # -T -> To directly copy the contents of $CURRENT_TEMPLATE_DIR into $filepath instead of adding the top level directory
-    # -L -> To follow $CURRENT_TEMPLATE_DIR if it's a symbolic link
-    cp -rTL "$CURRENT_TEMPLATE_DIR" "$filepath/"
-  done
-
   # Remove the search marker if present
   rm -f "$filepath/$CONTINUE_SEARCH_MARKER"
-
-  # Rename files that include $PROBLEM_NAME
-  find "$filepath" -type f -print0 | xargs -0 "$RENAME" "\$PROBLEM_NAME" "$PROBLEM_NAME" 2>/dev/null || true
-
-  # Envsubst PROBLEM_NAME in files
-  export PROBLEM_NAME
-  REPLACE_STRING='${PROBLEM_NAME}'
-  find $filepath -type f -print0 | xargs -0 -I{} bash -c 'TEMP=$(mktemp) && cat "$1" > "$TEMP" && envsubst '"'$REPLACE_STRING'"' < "$TEMP" > "$1" && rm "$TEMP"' \
-    -- {}
-
-  # Run optional setup
-  pushd "$filepath" >/dev/null
-  if [[ -x "./setup" ]]; then
-    echo "⚙️ Running setup..."
-    ./setup
-  fi
-  popd >/dev/null
 
   echo "✅ Done: $filepath"
 done

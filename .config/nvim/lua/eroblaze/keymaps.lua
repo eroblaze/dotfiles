@@ -44,3 +44,6 @@ vim.keymap.set("n", "<leader>tm", ":+tabmove<CR>", { noremap = true, desc = "Mov
 
 -- Wrap Lines in a Window (Toggle)
 vim.keymap.set("n", "<leader>w", ":set wrap!<CR>", { desc = "Toggle line wrap" })
+
+-- Remap Esc to switch to Normal mode in Terminal buffers
+vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { noremap = true })

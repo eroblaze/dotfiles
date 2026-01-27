@@ -1,7 +1,0 @@
-Language: Cpp
-ColumnLimit: 120
-AllowShortIfStatementsOnASingleLine: AllIfsAndElse
-AllowShortBlocksOnASingleLine: Always
-AllowShortFunctionsOnASingleLine: All
-AllowShortLambdasOnASingleLine: All
-AllowShortLoopsOnASingleLine: true

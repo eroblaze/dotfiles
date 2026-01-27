@@ -1,4 +1,54 @@
 #!/usr/bin/env python3
+# +-----------------------------------------------------------------------+
+# |                   COMPETITIVE COMPANION DOWNLOADER                    |
+# +-----------------------------------------------------------------------+
+# | This script listens to the "Competitive Companion" browser extension  |
+# | on Port 10046. When you click the green "+" button in your browser,   |
+# | it captures the problem data, creates a folder using 'make_prob',     |
+# | and saves the sample tests (1.in, 1.out, etc.) inside the 'io/' dir.  |
+# +-----------------------------------------------------------------------+
+# | COMMANDS & FLAGS:                                                     |
+# +-----------------------------------------------------------------------+
+# | (Default)  : Listens for exactly 1 "batch". This is usually one click |
+# |              in the browser (either 1 problem or 1 full contest).     |
+# |                                                                       |
+# | <name>...  : Explicitly set the folder name(s) instead of auto-naming.|
+# |              Example: download_prob.py A B C                          |
+# |                                                                       |
+# | -n COUNT   : (--number) Listen for exactly COUNT problems.            |
+# |              Example: download_prob.py -n 4                           |
+# |                                                                       |
+# | -b COUNT   : (--batches) Listen for COUNT batches. Default is 1.      |
+# |              Example: download_prob.py -b 2                           |
+# |                                                                       |
+# | -t TIME    : (--timeout) Listen indefinitely until TIME seconds pass  |
+# |              with no new data. Good for unpredictable downloads.      |
+# |              Example: download_prob.py -t 5.5                         |
+# |                                                                       |
+# | --dryrun   : Simulates the download. Prints what it WOULD do without  |
+# |              actually creating folders or saving files.               |
+# |                                                                       |
+# | --echo     : Debug mode. Prints the raw JSON data received from the   |
+# |              browser and does nothing else.                           |
+# +-----------------------------------------------------------------------+
+
+# +-----------------------------------------------------------------------+
+# |                           KEY CONCEPTS                                |
+# +-----------------------------------------------------------------------+
+# | BATCH   : One "click" or request from your browser. A batch can hold  |
+# |           one problem or a whole contest. e.g., Running -b 3 means    |
+# |           the script stays open until you click the download button   |
+# |           three separate times in your browser.                       |
+# |                                                                       |
+# | COUNT   : The total number of individual problems to receive before   |
+# |           shutting down. e.g., Using -n 3 to download exactly 3      |
+# |           problems and then stop.                                     |
+# |                                                                       |
+# | DRY RUN : A simulation mode for safety. It prints actions without     |
+# |           touching your disk. e.g., Verifying if a problem name is    |
+# |           detected correctly before creating the folder.              |
+# +-----------------------------------------------------------------------+
+
 """Download and setup problems from Competitive Companion
 
 Usage:
@@ -8,12 +58,12 @@ Usage:
 Options:
   -h --help     Show this screen.
   --echo        Just echo received responses and exit.
-  --dryrun      Don't actually create any problems
+  --dryrun      Don't actually create any problems (useful for testing).
 
 Download limit options:
-  -n COUNT, --number COUNT   Number of problems.
-  -b COUNT, --batches COUNT  Number of batches. (Default 1 batch)
-  -t TIME, --timeout TIME    Timeout for listening to problems. in seconds
+  -n COUNT, --number COUNT   Number of problems to download.
+  -b COUNT, --batches COUNT  Number of batches to download. (Default 1 batch)
+  -t TIME, --timeout TIME    Timeout for listening to problems in seconds.
 """
 
 import http.server
@@ -21,33 +71,81 @@ import json
 import re
 import subprocess
 import sys
+import shutil
 from pathlib import Path
 
+# external dependency: pip install docopt
 from docopt import docopt
 
-# Returns unmarshalled or None
+
+# -----------------------------------------------------------------------------
+# HTTP Server Classes
+# -----------------------------------------------------------------------------
+
+
+class ReusableHTTPServer(http.server.HTTPServer):
+    """
+    A custom HTTP server that allows the port to be reused immediately.
+    This prevents the "Address already in use" error if you stop and restart
+    the script quickly.
+    """
+
+    allow_reuse_address = True
 
 
 def listen_once(*, timeout=None):
+    """
+    Listens for a single HTTP POST request from Competitive Companion.
+    Returns the parsed JSON data or None if timed out.
+    """
     json_data = None
 
     class CompetitiveCompanionHandler(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
+            """Handle the POST request sent by the browser extension."""
             nonlocal json_data
-            json_data = json.load(self.rfile)
 
-    with http.server.HTTPServer(('127.0.0.1', 10046), CompetitiveCompanionHandler) as server:
-        server.timeout = timeout
-        server.handle_request()
+            # 1. Read the length of the data being sent
+            content_length = int(self.headers.get("Content-Length", 0))
+
+            # 2. Read the actual data
+            body = self.rfile.read(content_length)
+            json_data = json.loads(body)
+
+            # 3. Send a 200 OK response.
+            # Crucial: The extension waits for this confirmation.
+            self.send_response(200)
+            self.end_headers()
+
+        def log_message(self, format, *args):
+            """Override to suppress default server logging to stdout."""
+            pass
+
+    # Start the server on localhost:10046 (Default Competitive Companion port)
+    try:
+        with ReusableHTTPServer(
+            ("127.0.0.1", 10046), CompetitiveCompanionHandler
+        ) as server:
+            server.timeout = timeout
+            server.handle_request()  # Wait for one request or timeout
+    except OSError as e:
+        print(f"❌ Error binding to port 10046: {e}")
+        print("   Ensure no other instance of this script is running.")
+        sys.exit(1)
 
     if json_data is not None:
-        print(f"Got data {json.dumps(json_data)}")
+        print(f"✅ Received problem: {json_data.get('name', 'Unknown')}")
     else:
-        print("Got no data")
+        print("❌ Timed out or got no data")
+
     return json_data
 
 
 def listen_many(*, num_items=None, num_batches=None, timeout=None):
+    """
+    Listens for multiple problems based on count, batches, or timeout.
+    """
+    # CASE 1: Listen for a specific number of problems
     if num_items is not None:
         res = []
         for _ in range(num_items):
@@ -55,25 +153,41 @@ def listen_many(*, num_items=None, num_batches=None, timeout=None):
             res.append(cur)
         return res
 
+    # CASE 2: Listen for specific number of batches (e.g., a whole contest)
     if num_batches is not None:
         res = []
+        batches = {}  # Stores { batch_id: [remaining_problems, total_problems] }
 
-        batches = {}
-        while len(batches) < num_batches or any(need for need, tot in batches.values()):
-            print(f"Waiting for {num_batches} batches:", batches)
+        # Keep listening until we have found 'num_batches' unique batches
+        # AND all problems in those batches have been received.
+        while len(batches) < num_batches or any(
+            remaining > 0 for remaining, total in batches.values()
+        ):
+            print(
+                f"[!] Waiting for batches... (Current state: {len(batches)}/{num_batches} batches found)"
+            )
+
             cur = listen_once(timeout=None)
+            if cur is None:
+                continue
+
             res.append(cur)
 
-            cur_batch = cur['batch']
-            batch_id = cur_batch['id']
-            batch_cnt = cur_batch['size']
+            # Extract batch info provided by Competitive Companion
+            cur_batch = cur["batch"]
+            batch_id = cur_batch["id"]
+            batch_cnt = cur_batch["size"]
+
             if batch_id not in batches:
                 batches[batch_id] = [batch_cnt, batch_cnt]
-            assert batches[batch_id][0] > 0
-            batches[batch_id][0] -= 1
+
+            if batches[batch_id][0] > 0:
+                batches[batch_id][0] -= 1
 
         return res
 
+    # CASE 3: Default / Timeout Mode
+    # Listen for at least one problem, then keep listening until timeout happens (silence).
     res = [listen_once(timeout=None)]
     while True:
         cnd = listen_once(timeout=timeout)
@@ -83,110 +197,186 @@ def listen_many(*, num_items=None, num_batches=None, timeout=None):
     return res
 
 
-NAME_PATTERN = re.compile(r'^(?:Problem )?([A-Z][0-9]*)\b')
+# -----------------------------------------------------------------------------
+# Naming Logic
+# -----------------------------------------------------------------------------
+
+NAME_PATTERN = re.compile(r"^(?:Problem )?([A-Z][0-9]*)\b")
 
 
 def get_prob_name(data):
-    if 'USACO' in data['group']:
-        if 'fileName' in data['input']:
-            names = [data['input']['fileName'].rstrip(
-                '.in'), data['output']['fileName'].rstrip('.out')]
+    """
+    Heuristics to determine a clean directory name from problem data.
+    Will return names like 'B-buying_and_selling'.
+    """
+    full_name = data.get("name", "")
+
+    # 1. Check for USACO specific file naming
+    if "USACO" in data["group"]:
+        if "fileName" in data["input"]:
+            names = [
+                data["input"]["fileName"].rstrip(".in"),
+                data["output"]["fileName"].rstrip(".out"),
+            ]
             if len(set(names)) == 1:
                 return names[0]
 
-    if 'url' in data and data['url'].startswith('https://www.codechef.com'):
-        return data['url'].rstrip('/').rsplit('/')[-1]
+    # 2. Check for CodeChef URL structure
+    if "url" in data and data["url"].startswith("https://www.codechef.com"):
+        return data["url"].rstrip("/").rsplit("/")[-1]
 
-    patternMatch = NAME_PATTERN.search(data['name'])
+    # 3. Standard parsing (e.g., Codeforces "B. Buying and Selling")
+    patternMatch = NAME_PATTERN.search(full_name)
     if patternMatch is not None:
-        return patternMatch.group(1)
+        short_id = patternMatch.group(1)  # e.g., "B"
 
-    print(f"For data: {json.dumps(data, indent=2)}")
-    return input("What name to give? ")
+        # Attempt to get the descriptive part of the name
+        # Remove the ID and common separators from the start of the full name
+        # e.g., "B. Buying and Selling" -> "Buying and Selling"
+        description = re.sub(
+            rf"^.*?\b{short_id}\b[\.\s\-\:]*", "", full_name, flags=re.IGNORECASE
+        )
+
+        # Sanitize the description: lowercase, non-alphanumeric to underscores
+        description = description.lower()
+        description = re.sub(r"[^a-z0-9]+", "_", description).strip("_")
+
+        # Combine: B-buying_and_selling
+        if description:
+            return f"{short_id}-{description}"
+        return short_id
+
+    # 4. Fallback: Ask the user manually
+    print(f"❌ Could not auto-detect name for: {full_name}")
+    return input("What name to give? ").strip()
+
+
+# -----------------------------------------------------------------------------
+# File Operations
+# -----------------------------------------------------------------------------
 
 
 def save_samples(data, prob_dir):
-    with open(prob_dir / 'problem.json', 'w') as f:
-        json.dump(data, f)
+    """
+    Saves the JSON data and sample input/output files to the directory.
+    """
+    # Save full problem data for reference in the problem root
+    with open(prob_dir / "problem.json", "w") as f:
+        json.dump(data, f, indent=2)
 
-    for i, t in enumerate(data['tests'], start=1):
-        with open(prob_dir / f'{i}.in', 'w') as f:
-            f.write(t['input'])
-        with open(prob_dir / f'{i}.out', 'w') as f:
-            f.write(t['output'])
+    # Define the io subdirectory inside the problem folder
+    io_dir = prob_dir / "io"
 
-# Providing name = '.'
+    # Ensure the 'io' directory exists (create it if missing)
+    io_dir.mkdir(parents=True, exist_ok=True)
+
+    # Save test cases into the 'io' folder (io/1.in, io/1.out, etc.)
+    for i, t in enumerate(data["tests"], start=1):
+        with open(io_dir / f"{i}.in", "w") as f:
+            f.write(t["input"])
+        with open(io_dir / f"{i}.out", "w") as f:
+            f.write(t["output"])
 
 
 def make_prob(data, name=None):
+    """
+    Main driver: determines name, creates folder (via global bash script), and saves samples.
+    """
     if name is None:
         name = get_prob_name(data)
 
-    prob_dir = Path('.')/name
+    # Sanitize name for filesystem (no slashes)
+    name = name.replace("/", "_").replace("\\", "_")
+    prob_dir = Path(".") / name
 
-    if name == '.':
-        print("Using current directory...")
-        pass
+    if name == ".":
+        print("📁 Using current directory...")
     elif prob_dir.exists() and prob_dir.is_dir():
-        # Skip making it
-        print(f"Already created problem {name}...")
+        print(f"⚠️  Already created problem {name}...")
     else:
-        print(f"Creating problem {name}...")
-
-        MAKE_PROB = Path(sys.path[0]) / 'make_prob.sh'
-        try:
-            subprocess.check_call(
-                [MAKE_PROB, name], stdout=sys.stdout, stderr=sys.stderr)
-        except subprocess.CalledProcessError as e:
-            print(f"Got error {e}")
+        # Check if 'make_prob' is available in the system PATH
+        if shutil.which("make_prob") is None:
+            print("❌ Error: 'make_prob' command not found in PATH.")
+            print("   Please ensure your bash script is executable and in your $PATH.")
             return
 
-    print("Saving samples...")
-    save_samples(data, prob_dir)
+        # Call the global bash script
+        try:
+            subprocess.check_call(
+                ["make_prob", name], stdout=sys.stdout, stderr=sys.stderr
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Error running make_prob: {e}")
+            return
 
-    print()
+    print(f"📁 Saving samples to {prob_dir}...")
+    save_samples(data, prob_dir)
+    print("✅ Done.\n")
+
+
+# -----------------------------------------------------------------------------
+# Main Entry Point
+# -----------------------------------------------------------------------------
 
 
 def main():
     arguments = docopt(__doc__)
 
-    if arguments['--echo']:
-        while True:
-            print(listen_once())
-    else:
-        dryrun = arguments['--dryrun']
-
-        def run_make_prob(*args, **kwargs):
-            nonlocal dryrun
-            if dryrun:
-                print(f"make_prob(*args={args}, **kwargs={kwargs})")
-                return
-            make_prob(*args, **kwargs)
-
-        if names := arguments['<name>']:
-            datas = listen_many(num_items=len(names))
-            for data, name in zip(datas, names):
-                run_make_prob(data, name)
-        elif cnt := arguments['--number']:
-            cnt = int(cnt)
-            datas = listen_many(num_items=cnt)
-            for data in datas:
-                run_make_prob(data)
-        elif batches := arguments['--batches']:
-            batches = int(batches)
-            datas = listen_many(num_batches=batches)
-            for data in datas:
-                run_make_prob(data)
-        elif timeout := arguments['--timeout']:
-            timeout = float(timeout)
-            datas = listen_many(timeout=timeout)
-            for data in datas:
-                run_make_prob(data)
+    try:
+        # Mode: Simply echo back what is received (good for debugging)
+        if arguments["--echo"]:
+            while True:
+                print(listen_once())
         else:
-            datas = listen_many(num_batches=1)
-            for data in datas:
-                run_make_prob(data)
+            dryrun = arguments["--dryrun"]
+
+            # Wrapper to handle dryrun flag
+            def run_make_prob(*args, **kwargs):
+                nonlocal dryrun
+                if dryrun:
+                    print(f"[Dry Run] make_prob(*args={args}, **kwargs={kwargs})")
+                    return
+                make_prob(*args, **kwargs)
+
+            # Logic to determine how many problems/batches to listen for
+            if names := arguments["<name>"]:
+                # User provided names manually via CLI
+                datas = listen_many(num_items=len(names))
+                for data, name in zip(datas, names):
+                    run_make_prob(data, name)
+
+            elif cnt := arguments["--number"]:
+                # User specified a count (e.g., -n 3)
+                cnt = int(cnt)
+                datas = listen_many(num_items=cnt)
+                for data in datas:
+                    run_make_prob(data)
+
+            elif batches := arguments["--batches"]:
+                # User specified batches (e.g., -b 1)
+                batches = int(batches)
+                datas = listen_many(num_batches=batches)
+                for data in datas:
+                    run_make_prob(data)
+
+            elif timeout := arguments["--timeout"]:
+                # User specified a timeout
+                timeout = float(timeout)
+                datas = listen_many(timeout=timeout)
+                for data in datas:
+                    run_make_prob(data)
+
+            else:
+                # Default behavior: Listen for exactly 1 batch (commonly 1 contest or 1 problem)
+                datas = listen_many(num_batches=1)
+                for data in datas:
+                    run_make_prob(data)
+
+    except KeyboardInterrupt:
+        # Catch Ctrl+C and exit gracefully without an error traceback
+        print("\n👋 Interrupted by user. Exiting...")
+        sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
