@@ -28,21 +28,53 @@ PROBLEM_NAME := sol
 DEBUG        := true
 
 # +-----------------------------------------------------------------------+
+# |                          PLATFORM DETECTION                           |
+# +-----------------------------------------------------------------------+
+
+# Set PLATFORM to 'auto', 'desktop', or 'phone'
+PLATFORM := auto
+
+ifeq ($(PLATFORM),auto)
+		# Use the Make built-in 'findstring' to search for "Android" in the kernel info.
+		# This is more robust than shell piping inside a Makefile.
+		IS_PHONE := $(if $(findstring Android,$(shell uname -a)),true,false)
+else ifeq ($(PLATFORM),phone)
+    IS_PHONE := true
+else
+    IS_PHONE := false
+endif
+
+# +-----------------------------------------------------------------------+
 # |                       DYNAMIC ROOT DETECTION                          |
 # +-----------------------------------------------------------------------+
-# Recursively search up the directory tree (starting from the PWD) to find .clang-format (This is the marker for the Root directory. The PCH.h file must be in that folder on phones for Termux)
+
+# Set the marker file based on the detected platform
+ifeq ($(IS_PHONE),true)
+    ROOT_MARKER := PCH.h
+else
+    ROOT_MARKER := .clang-format
+endif
+
+# Recursively search up the directory tree (starting from the PWD) to find the appropriate marker
 _REL_ROOT := $(shell \
     p="."; \
     while true; do \
-        if [ -f "$$p/.clang-format" ]; then echo "$$p"; break; fi; \
+        if [ -f "$$p/$(ROOT_MARKER)" ]; then echo "$$p"; break; fi; \
         if [ "$$(cd "$$p" && pwd)" = "/" ]; then break; fi; \
         p="$$p/.."; \
     done \
 )
 
-# Fallback check
+# Conditional Fallback logic
 ifeq ($(_REL_ROOT),)
-    $(error "❌ Error: Could not find .clang-format in the PWD or any parent directory. ROOT_DIR not found.")
+    ifeq ($(IS_PHONE),true)
+        # On Phone: Throw an error and stop execution
+        $(error "[ERROR] Could not find $(ROOT_MARKER) in the PWD or any parent directory. ROOT_DIR not found.")
+    else
+        # On Laptop: Alert the user and fallback to current directory
+        $(info [WARN] Could not find $(ROOT_MARKER) in any parent directory. Defaulting to PWD as root.)
+        _REL_ROOT := .
+    endif
 endif
 
 # Convert to an absolute path to prevent Clang "file not found" errors
@@ -50,7 +82,11 @@ endif
 ROOT_DIR := $(abspath $(_REL_ROOT))
 
 # Print out the resolved root directory path
-$(info [ROOT_DIR]: $(ROOT_DIR))
+$(info [ROOT_DIR] $(ROOT_DIR))
+
+# +-----------------------------------------------------------------------+
+# |                       DIRECTORY & BUILD TARGETS                       |
+# +-----------------------------------------------------------------------+
 
 # Subdirectory for all sample inputs, outputs, results, and benchmarks
 IO_DIR       := io
@@ -67,21 +103,8 @@ EXECUTE       := ./$(TARGET)
 CLEAN_TARGETS := $(TARGET)
 
 # +-----------------------------------------------------------------------+
-# |                PLATFORM DETECTION & COMPILER CONFIG                   |
+# |                           COMPILER CONFIG                             |
 # +-----------------------------------------------------------------------+
-
-# Set PLATFORM to 'auto', 'desktop', or 'phone'
-PLATFORM := auto
-
-ifeq ($(PLATFORM),auto)
-		# Use the Make built-in 'findstring' to search for "Android" in the kernel info.
-		# This is more robust than shell piping inside a Makefile.
-		IS_PHONE := $(if $(findstring Android,$(shell uname -a)),true,false)
-else ifeq ($(PLATFORM),phone)
-    IS_PHONE := true
-else
-    IS_PHONE := false
-endif
 
 # Compiler and PCH Logic Mapping
 ifeq ($(IS_PHONE),true)
