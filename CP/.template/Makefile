@@ -27,8 +27,30 @@
 PROBLEM_NAME := sol
 DEBUG        := true
 
-# Root directory of your project (one level up from this Makefile location)
-ROOT_DIR     := ..
+# +-----------------------------------------------------------------------+
+# |                       DYNAMIC ROOT DETECTION                          |
+# +-----------------------------------------------------------------------+
+# Recursively search up the directory tree (starting from the PWD) to find .clang-format (This is the marker for the Root directory. The PCH.h file must be in that folder on phones for Termux)
+_REL_ROOT := $(shell \
+    p="."; \
+    while true; do \
+        if [ -f "$$p/.clang-format" ]; then echo "$$p"; break; fi; \
+        if [ "$$(cd "$$p" && pwd)" = "/" ]; then break; fi; \
+        p="$$p/.."; \
+    done \
+)
+
+# Fallback check
+ifeq ($(_REL_ROOT),)
+    $(error "❌ Error: Could not find .clang-format in the PWD or any parent directory. ROOT_DIR not found.")
+endif
+
+# Convert to an absolute path to prevent Clang "file not found" errors
+# when dealing with deeply nested ../../../ directories.
+ROOT_DIR := $(abspath $(_REL_ROOT))
+
+# Print out the resolved root directory path
+$(info [ROOT_DIR]: $(ROOT_DIR))
 
 # Subdirectory for all sample inputs, outputs, results, and benchmarks
 IO_DIR       := io
