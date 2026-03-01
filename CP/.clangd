@@ -1,3 +1,9 @@
 CompileFlags:
-  Add: [-std=c++23]
-
+  Add:
+    - -std=c++23
+    - -Wall
+    - -Wextra
+    - -Wshadow
+    - -Wfloat-equal
+    - -Wconversion
+    - -O2
